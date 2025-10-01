@@ -12,7 +12,15 @@ import distRoutes from './routes/distributorRouter.js'
 const app = express()
 app.use(express.json()) 
 
-app.use(cors())
+
+const corsOptions = {
+    origin: ['https://cash-counter-frontend.vercel.app', 'http://localhost:5173'],
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  };
+  
+
+app.use(cors(corsOptions))
 
 //Port
 const PORT  =  process.env.PORT ||  4000;
