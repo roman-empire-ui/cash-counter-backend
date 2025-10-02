@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt'
 import Admin from '../models/userModel.js'
 import genToken from '../utils/genToken.js'
+import crypto from 'crypto'
 
 
 
@@ -51,6 +52,39 @@ export const signin = async (req, res) => {
   }
 };
 
+
+
+
+
+// ---------------- RESET PASSWORD DIRECTLY ----------------
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword, confirmPassword } = req.body;
+
+    if (!email || !newPassword || !confirmPassword) {
+      return res.status(400).json({ success: false, message: "Please fill in all fields" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ success: false, message: "Passwords do not match" });
+    }
+
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    admin.password = await bcrypt.hash(newPassword, salt);
+
+    await admin.save();
+
+    res.status(200).json({ success: true, message: "Your password has been reset successfully" });
+  } catch (e) {
+    console.error("Reset error:", e);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 
 
 
